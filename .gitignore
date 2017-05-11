@@ -1,0 +1,4 @@
+# dataフォルダはいらない
+data/
+
+.DS_Store
