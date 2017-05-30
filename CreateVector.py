@@ -310,8 +310,6 @@ def CreateVector_Hist_fullword(filename, minWord, verbDictSize, removeVerb):
     f.close()
 
 
-
-
 def main(filename, useWord):
     CreateVector(filename, useWord)
 

@@ -17,7 +17,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import Heatmap
 from scipy.sparse import lil_matrix, csr_matrix
-
+from gensim.models import word2vec
 
 def Gridsearch():
     # digits = datasets.load_digits()
@@ -186,28 +186,32 @@ if __name__ == '__main__':
     # result = DimensionReduction("ans_1", matrix, 2)
     # print result
     # database()
-    start = time.time()
-    # vectorData.csv -> classify by SVM
-    counter = 0
-    f = open("data/trainingData_ans_1.csv", "r")
-    while True:
-        counter += 1
-        l = f.readline()
-        if counter > 500000:
-            break
+    # start = time.time()
+    # # vectorData.csv -> classify by SVM
+    # counter = 0
+    # f = open("data/trainingData_ans_1.csv", "r")
+    # while True:
+    #     counter += 1
+    #     l = f.readline()
+    #     if counter > 500000:
+    #         break
+    #
+    # elapsed_time = time.time() - start
+    # print "%s [sec]" % (elapsed_time)
+    # f.close()
+    #
+    # start = time.time()
+    # # vectorData.csv -> classify by SVM
+    # counter = 0
+    # for line in open("data/trainingData_ans_1.csv", "r"):
+    #     counter += 1
+    #     l = line
+    #     if counter > 500000:
+    #         break
+    #
+    # elapsed_time = time.time() - start
+    # print "%s [sec]" % (elapsed_time)
 
-    elapsed_time = time.time() - start
-    print "%s [sec]" % (elapsed_time)
-    f.close()
-
-    start = time.time()
-    # vectorData.csv -> classify by SVM
-    counter = 0
-    for line in open("data/trainingData_ans_1.csv", "r"):
-        counter += 1
-        l = line
-        if counter > 500000:
-            break
-
-    elapsed_time = time.time() - start
-    print "%s [sec]" % (elapsed_time)
+    model = word2vec.Word2Vec.load("data/w2v_ng1ans_1.model")
+    print type(model)
+    print model.vector_size

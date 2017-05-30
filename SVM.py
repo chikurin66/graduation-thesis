@@ -544,6 +544,7 @@ def createTrainingVec_w2v(filename, useWord, sampleSize, opt, n_class):
     # w2vモデルの読み込み
     model = word2vec.Word2Vec.load("data/w2v_ng1" + filename + ".model")
 
+
     f = open('data/verbDict_w2v_' + filename + '.json', 'r')
     verbDict = json.load(f)
     f.close()

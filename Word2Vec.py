@@ -29,8 +29,10 @@ def train(filename):
 def similar(filename, w):
     model = word2vec.Word2Vec.load("data/w2v_" + filename + ".model")
     print model[w]
-    results = model.most_similar(positive=[w, u"犬"], negative=u"猫", topn=10)
+    results = model.most_similar(positive=[w, u"女"], negative=u"男", topn=10)
+    # results = model.most_similar(positive=w, topn=10)
     # ライオン　ー　猫　＋　犬　＝　オオカミ？
+    # 王様　ー　男　＋　女　＝　女王
 
     for result in results:
         print result[0], '\t', result[1]
@@ -38,5 +40,5 @@ def similar(filename, w):
 if __name__ == '__main__':
     # train("neko")
     # similar("neko", unicode("書生", "utf-8"))
-    train("ans_1")
-    # similar("ans_1", u"ライオン")
+    # train("ans_1")
+    similar("ans_1", u"王様")

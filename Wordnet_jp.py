@@ -65,10 +65,10 @@ def getSynonym(word):
 def searchSynonym(word, show):
     synonym = getSynonym(word)
     if show:
-        print "synonym of", word, "is"
+        print "synonym of", word, ":"
         for key, value in synonym.items():
             print key, "\t",
-           z for x in value:
+            for x in value:
                 print x,
             print ""
         print ""
@@ -80,5 +80,5 @@ if __name__ == '__main__':
     #     pprint(synonym)
     # else:
     #     print("You need at least 1 argument as a word like below.\nExample:\n  $ python3 wordnet_jp 楽しい")
-    for word in ["作る", "答える", "有る", "困る", "いける", "購入", "戻る", "辞める", "いう", "終わる"]:
+    for word in ["カウント"]:
         searchSynonym(word, show=True)
