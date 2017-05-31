@@ -7,8 +7,13 @@ import Wordnet_jp as wn
 def getGoiDict(filename="goi.csv", verbOnly='True'):
     isVerb = False
     goidict = {}
-    for line in open("data/" + filename, 'r'):
+    f = open("data/" + filename, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines[1:]:
         _, word, _, level, pos, pos1, _ = line.split(',')
+        # make level statement int (1~6)
+        level = int(level.split(".")[0])
 
         # 感動詞は除いて，動詞を抽出
         if '感' not in pos and '動詞' in pos:
@@ -24,6 +29,7 @@ def getGoiDict(filename="goi.csv", verbOnly='True'):
         if verbOnly and isVerb:
             goidict[word] = [level, pos, pos1]
             isVerb = False
+
         elif not verbOnly:
             goidict[word] = [level, pos, pos1]
 

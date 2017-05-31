@@ -80,5 +80,5 @@ if __name__ == '__main__':
     #     pprint(synonym)
     # else:
     #     print("You need at least 1 argument as a word like below.\nExample:\n  $ python3 wordnet_jp 楽しい")
-    for word in ["カウント"]:
+    for word in ["取る"]:
         searchSynonym(word, show=True)
