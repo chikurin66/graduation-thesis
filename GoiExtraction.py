@@ -71,6 +71,7 @@ def getSynLevelDict(verb):
 
     return synLevel_dic
 
+
 def getAggregatedDict(goiDict):
     agg_dic = {}
     # 語彙辞書の動詞の類義語をワードネットで探し，
@@ -88,18 +89,35 @@ def getAggregatedDict(goiDict):
                 break
     return agg_dic
 
+
+def d2e():
+    f = open('data/aggregatedDict.json', 'r')
+    agg_e2d = json.loads(f.read(), 'utf-8')
+    f.close()
+
+    agg_d2e = {}
+    for key, value in agg_e2d.items():
+        for v in value:
+            if v not in agg_d2e:
+                agg_d2e[v] = list()
+            agg_d2e[v].append(key)
+
+    text1 = json.dumps(agg_e2d, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    with open('data/aggregatedDict_e2d.json', 'w') as f1:
+        f1.write(text1.encode("utf-8"))
+
+    text2 = json.dumps(agg_d2e, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    with open('data/aggregatedDict_d2e.json', 'w') as f2:
+        f2.write(text2.encode("utf-8"))
+
+
 if __name__ == '__main__':
     dict = getGoiDict("goi.csv", verbOnly=True, levelOnly=True)
     showGoiDict(dict)
     # synLevel_dic = getSynLevelDict("カウント")
-    agg_dic = getAggregatedDict(dict)
+    # agg_dic = getAggregatedDict(dict)
 
-    for k, v in agg_dic.items():
-        print k, " : ",
-        for val in v:
-            print val,
-        print ""
+    # fo = open('data/aggregatedDict' + '.json', 'w')
+    # json.dump(agg_dic, fo, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    # fo.close()
 
-    fo = open('data/aggregatedDict' + '.json', 'w')
-    json.dump(agg_dic, fo, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
-    fo.close()
