@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import Wordnet_jp as wn
+import json
 
 
-def getGoiDict(filename="goi.csv", verbOnly='True'):
+def getGoiDict(filename="goi.csv", verbOnly=True, levelOnly=True):
     isVerb = False
     goidict = {}
     f = open("data/" + filename, 'r')
@@ -33,38 +34,72 @@ def getGoiDict(filename="goi.csv", verbOnly='True'):
         elif not verbOnly:
             goidict[word] = [level, pos, pos1]
 
-    return goidict
+    if levelOnly:
+        goiLevelDict = {}
+        for key, value in goidict.items():
+            goiLevelDict[key] = value[0]
+        return goiLevelDict
+
+    else:
+        return goidict
 
 
 def showGoiDict(goidict):
     print len(goidict)
     for word, value in goidict.items():
         print word, '\t',
-        print value[0], value[1], value[2]
+        if isinstance(value, list):
+            print value[0], value[1], value[2]
+        else:
+            print value
 
 
-def simplifyVerb(verb):
-
+def getSynLevelDict(verb):
     synonym_dic = wn.searchSynonym(verb, show=False)
     synonym_set = set()
 
     for key, value in synonym_dic.items():
-        print key, "\t",
         for x in value:
             synonym_set.add(x)
-            print x,
-        print ""
-    print ""
 
-    goidict = getGoiDict("goi.csv")
-    simplest_verb = [synonym_set.pop(), goidict[synonym_set[0]][1]]
+    goidict = getGoiDict("goi.csv", verbOnly=True, levelOnly=True)
 
-    return simplest_verb
+    synLevel_dic = {i: list() for i in range(7)[1:]}
+    for verb in synonym_set:
+        if goidict.has_key(verb):
+            synLevel_dic[goidict[verb]].append(verb)
 
+    return synLevel_dic
+
+def getAggregatedDict(goiDict):
+    agg_dic = {}
+    # 語彙辞書の動詞の類義語をワードネットで探し，
+    # その類義語で一番簡単な動詞をkeyとする辞書に追加（list表現で）
+    for verb, level in goiDict.items():
+
+        synLevel_dic = getSynLevelDict(verb)
+        # 一番簡単な動詞のリストを追加
+        for i, value in synLevel_dic.items():
+            if len(value) > 0:
+                for v in value:
+                    if not agg_dic.has_key(v):
+                        agg_dic[v] = list()
+                    agg_dic[v].append(verb)
+                break
+    return agg_dic
 
 if __name__ == '__main__':
-    dict = getGoiDict("goi.csv")
+    dict = getGoiDict("goi.csv", verbOnly=True, levelOnly=True)
     showGoiDict(dict)
-    simplest_verb = simplifyVerb("カウント")
-    print simplest_verb[0], simplest_verb[1]
+    # synLevel_dic = getSynLevelDict("カウント")
+    agg_dic = getAggregatedDict(dict)
 
+    for k, v in agg_dic.items():
+        print k, " : ",
+        for val in v:
+            print val,
+        print ""
+
+    fo = open('data/aggregatedDict' + '.json', 'w')
+    json.dump(agg_dic, fo, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    fo.close()
