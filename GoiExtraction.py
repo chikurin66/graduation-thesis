@@ -34,6 +34,8 @@ def getGoiDict(filename="goi.csv", verbOnly=True, levelOnly=True):
         elif not verbOnly:
             goidict[word] = [level, pos, pos1]
 
+
+
     if levelOnly:
         goiLevelDict = {}
         for key, value in goidict.items():
@@ -111,13 +113,39 @@ def d2e():
         f2.write(text2.encode("utf-8"))
 
 
+def showDict(opt="e2d", mc=1):
+    f = open('data/aggregatedDict_' + opt + '.json', 'r')
+    agg_dict = json.load(f)
+    f.close()
+    counter = 0
+    for key, value in agg_dict.items():
+        if len(value) >= mc:
+            counter += 1
+            print key, " : ",
+            for v in value:
+                print v,
+            print ""
+    print "# of key is", counter
+
+
 if __name__ == '__main__':
-    dict = getGoiDict("goi.csv", verbOnly=True, levelOnly=True)
-    showGoiDict(dict)
+    # dict = getGoiDict("goi.csv", verbOnly=True, levelOnly=True)
+    # showGoiDict(dict)
+
+    # text1 = json.dumps(dict, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    # with open('data/goiLevelDict.json', 'w') as f1:
+    #     f1.write(text1)
+
     # synLevel_dic = getSynLevelDict("カウント")
     # agg_dic = getAggregatedDict(dict)
 
     # fo = open('data/aggregatedDict' + '.json', 'w')
     # json.dump(agg_dic, fo, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
     # fo.close()
+    goiDict = getGoiDict()
+    showGoiDict(goiDict)
 
+    with open("data/goiDi")
+    json.dump()
+
+    showDict(opt="e2d", mc=2)
