@@ -14,7 +14,7 @@ def PlainText(data_name):
     sentences = []
     count = 0
     f = open('data/plainText_' + data_name + '.txt', 'w')
-    for line in open('data/' + data_name + '.tsv','r'):
+    for line in open('data/' + data_name + '.tsv', 'r'):
         try:
             a = line.split('\t')[4]
             if a != '':
@@ -98,6 +98,7 @@ def main(filename):
     print "elapsed_time : %s [sec]" % elapsed_time
     print "elapsed_time : %s [min]" % (elapsed_time / 60)
     print "elapsed_time : %s [h]" % (elapsed_time / 3600)
+
 
 if __name__ == '__main__':
     # main('')

@@ -37,6 +37,7 @@ def similar(filename, w):
     for result in results:
         print result[0], '\t', result[1]
 
+
 if __name__ == '__main__':
     # train("neko")
     # similar("neko", unicode("書生", "utf-8"))
