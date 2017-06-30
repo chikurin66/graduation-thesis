@@ -8,6 +8,8 @@ import csv
 import collections
 import numpy as np
 from gensim.models import word2vec
+import MeCab
+
 
 
 # -------Spearman function------------
@@ -63,15 +65,42 @@ def cos_sim(v1, v2):
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 
-def get_w2v_similarity(key, model):
+def get_w2v_similarity(key, model, show=False):
     # key = 動詞1,動詞2
-    verb1, verb2 = key.split(',')
+    verbs = key.split(',')
 
-    if verb1 in model and verb2 in model:
-        similarity = cos_sim(model[verb1], model[verb2]) * 10
+    tagger = MeCab.Tagger('mecabrc')
+    verb_pair = ["", ""]
+    for i, verb in enumerate(verbs):
+        result = tagger.parse(verb)
+        for line in result.split('\n'):
+            if "\t" in line:
+                sur, others = line.split('\t')
+                elems = others.split(',')
+                if elems[0] == "動詞":
+                    verb_pair[i] = elems[6]
+                    break
+                elif elems[1] == "サ変接続":
+                    verb_pair[i] = elems[6]
+                    break
+
+    for i in range(2):
+        verb_pair[i] = verb_pair[i].decode('utf-8')
+
+        if show:
+            if verb_pair[i] in model:
+                print "Yes:", verb_pair[i], "(", verbs[i], ")"
+            else:
+                print "No :", verb_pair[i], "(", verbs[i], ")"
+    if show:
+        print " "
+
+    if verb_pair[0] in model and verb_pair[1] in model:
+        similarity = cos_sim(model[verb_pair[0]], model[verb_pair[1]]) * 10
+        # print "   verb :", verb1, verb2
     else:
-        similarity = -1.0
-        print("No verb :", verb1, verb2)
+        similarity = 0
+        # print "No verb :", verb1, verb2
 
     return similarity
 
@@ -82,17 +111,23 @@ if __name__ == '__main__':
     #print ('--------Spearman-------')
     #print (Spearman(sample_tuple_list))
 
-    modelName = "ans_1"
+    try:
+        modelName = sys.argv[1]
+    except:
+        modelName = "ans_1"
+    print "model is", "w2v_" + modelName + ".model"
     model = word2vec.Word2Vec.load("data/w2v_" + modelName + ".model")
     l = list()
-    with open(sys.argv[1], "r") as f:
+    # filename = sys.argv[1]
+    filename = "data/score_verb.csv"
+    with open(filename, "r") as f:
         reader = csv.reader(f)
         header = next(reader)
         for row in reader:
             key = row[0]+","+row[1]
             # csv内にあるコンピュータが出した類似度を一番最後になるようにしてください。
             # l.append((key, float(row[2]), float(row[-1])))
-            l.append((key, float(row[2]), float(get_w2v_similarity(key, model=model))))
+            l.append((key, float(row[2]), float(get_w2v_similarity(key, model=model, show=True))))
 
     w2rank_hum = dict()
     w2rank_w2v = dict()
@@ -118,9 +153,11 @@ if __name__ == '__main__':
     tuple_list = []
     for key in w2rank_w2v.keys():
         tuple_list.append((w2rank_hum[key], w2rank_w2v[key]))
-    print(tuple_list)
-    print ('--------Spearman-------')
-    print (Spearman(tuple_list))
+    # print(tuple_list)
+    # print ('--------Spearman-------')
+    print modelName
+    print Spearman(tuple_list)
+    print ""
 
 
 
