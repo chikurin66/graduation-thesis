@@ -73,6 +73,11 @@ def get_w2v_similarity(key, model, show=False):
     verb_pair = ["", ""]
     for i, verb in enumerate(verbs):
         result = tagger.parse(verb)
+        if len(result.split('\n')) >= 6:
+            for s in result.split('\n'):
+                print s
+            print "too many morphs:", verb
+            return None
         for line in result.split('\n'):
             if "\t" in line:
                 sur, others = line.split('\t')
@@ -92,8 +97,6 @@ def get_w2v_similarity(key, model, show=False):
                 print "Yes:", verb_pair[i], "(", verbs[i], ")"
             else:
                 print "No :", verb_pair[i], "(", verbs[i], ")"
-    if show:
-        print " "
 
     if verb_pair[0] in model and verb_pair[1] in model:
         similarity = cos_sim(model[verb_pair[0]], model[verb_pair[1]]) * 10
@@ -101,6 +104,51 @@ def get_w2v_similarity(key, model, show=False):
     else:
         similarity = 0
         # print "No verb :", verb1, verb2
+
+    if show:
+        print similarity
+        print ""
+
+    return similarity
+
+
+def get_w2v_similarity_sum(key, model, show=False):
+    # key = 動詞1,動詞2
+    verbs = key.split(',')
+
+    tagger = MeCab.Tagger('mecabrc')
+    verb_pair = []
+    temp_verb = []
+    verb_pair = []
+    for i, verb in enumerate(verbs):
+        result = tagger.parse(verb)
+        for line in result.split('\n')[:-2]:
+            if "\t" in line:
+                sur, others = line.split('\t')
+                elems = others.split(',')
+                temp_verb.append(elems[6])
+        verb_pair.insert(i, temp_verb)
+        temp_verb = []
+
+    words = []
+    vec = np.zeros(len(model[u'する']))
+    for morphs in verb_pair:
+        for morph in morphs:
+            if morph.decode('utf-8') not in model:
+                continue
+            vec += model[morph.decode('utf-8')]
+        words.append(vec)
+        vec = np.zeros(len(model[u'する']))
+    similarity = cos_sim(words[0], words[1]) * 10
+
+
+    if show:
+        for morphs in verb_pair:
+            for morph in morphs:
+                print morph,
+            print ""
+        print similarity
+        print ""
 
     return similarity
 
@@ -127,7 +175,10 @@ if __name__ == '__main__':
             key = row[0]+","+row[1]
             # csv内にあるコンピュータが出した類似度を一番最後になるようにしてください。
             # l.append((key, float(row[2]), float(row[-1])))
-            l.append((key, float(row[2]), float(get_w2v_similarity(key, model=model, show=True))))
+            re = get_w2v_similarity(key, model=model, show=True)
+            if re:
+                l.append((key, float(row[2]), float(re)))
+    print len(l)
 
     w2rank_hum = dict()
     w2rank_w2v = dict()
